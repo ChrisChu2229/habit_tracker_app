@@ -33,6 +33,50 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  // list for holding habits
+  List<String> _habits = [];
+
+  void _addHabit() {
+    // Create a controller to retrieve text from the TextField
+    TextEditingController _habitController = TextEditingController();
+
+    // Show a dialog to enter the new habit
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Add New Habit"),
+          content: TextField(
+            controller: _habitController,
+            decoration: InputDecoration(hintText: "Enter habit name"),
+          ),
+          actions: [
+            TextButton(
+              child: Text("Add"),
+              onPressed: () {
+                // get teh text from the controller
+                String newHabit = _habitController.text.trim();
+                if (newHabit.isNotEmpty) {
+                  // update the state with the new habit
+                  setState(() {
+                    _habits.add(newHabit);
+                  });
+                  Navigator.of(context).pop(); // close the dialog
+                }
+              },
+            ),
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop(); // close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
@@ -51,33 +95,33 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text("No habits added yet!"),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+      body: _habits.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text("No habits added yet!"),
+                  Text(
+                    '$_counter',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ],
+              ),
+            )
+          : ListView.builder(
+              itemCount: _habits.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_habits[index]),
+                  trailing: IconButton(
+                    icon: Icon(Icons.check),
+                    onPressed: () {
+                      // Handle habit done later
+                    },
+                  ),
+                );
+              },
             ),
-          ],
-        ),
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addHabit,
         tooltip: 'Add Habit',
@@ -86,5 +130,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
-class _addHabit {}
