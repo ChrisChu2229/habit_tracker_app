@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:habit_tracker_app/habit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,8 +34,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  // list for holding habits
-  List<String> _habits = [];
+  // *old* list for holding habits
+  // List<String> _habits = [];
+
+  List<Habit> _habits = [];
 
   void _addHabit() {
     // Create a controller to retrieve text from the TextField
@@ -55,11 +58,11 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Text("Add"),
               onPressed: () {
                 // get teh text from the controller
-                String newHabit = _habitController.text.trim();
-                if (newHabit.isNotEmpty) {
+                String newHabitName = _habitController.text.trim();
+                if (newHabitName.isNotEmpty) {
                   // update the state with the new habit
                   setState(() {
-                    _habits.add(newHabit);
+                    _habits.add(Habit(name: newHabitName));
                   });
                   Navigator.of(context).pop(); // close the dialog
                 }
@@ -75,17 +78,6 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       },
     );
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
   }
 
   @override
@@ -112,11 +104,20 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: _habits.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(_habits[index]),
-                  trailing: IconButton(
-                    icon: Icon(Icons.check),
-                    onPressed: () {
-                      // Handle habit done later
+                  title: Text(
+                    _habits[index].name,
+                    style: TextStyle(
+                      decoration: _habits[index].isCompleted
+                          ? TextDecoration.lineThrough
+                          : null,
+                    ),
+                  ),
+                  trailing: Checkbox(
+                    value: _habits[index].isCompleted,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _habits[index].isCompleted = value ?? false;
+                      });
                     },
                   ),
                 );
